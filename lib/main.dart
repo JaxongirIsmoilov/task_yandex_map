@@ -2,9 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:task_yandex_map/src/core/services/hive_service.dart';
 import 'package:task_yandex_map/src/features/select_address/presentation/select_address_page.dart';
 
-void main() {
+Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  HiveService.initHive();
+  await HiveService.initHive();
   runApp(const MyApp());
 }
 
