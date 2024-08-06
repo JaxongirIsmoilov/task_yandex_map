@@ -13,3 +13,15 @@ class GetAddressEvent extends SelectAddressEvent {
 class PickingAddressEvent extends SelectAddressEvent{
 
 }
+
+class SaveLocationsEvent extends SelectAddressEvent {
+  final BuildContext context;
+  final List<AppLatLong> locations;
+
+  SaveLocationsEvent({required this.locations, required this.context,});
+}
+
+class GettingLocationsEvent extends SelectAddressEvent {
+
+}
+

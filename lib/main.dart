@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:task_yandex_map/src/core/services/hive_service.dart';
 import 'package:task_yandex_map/src/features/select_address/presentation/bloc/select_address_bloc.dart';
+import 'package:task_yandex_map/src/features/select_address/presentation/saved_adresses_page.dart';
 import 'package:task_yandex_map/src/features/select_address/presentation/select_address_page.dart';
 
 Future<void> main() async {
@@ -27,7 +28,7 @@ class MyApp extends StatelessWidget {
         '/': (context) => BlocProvider(
               create: (context) => SelectAddressBloc(),
               child: SelectAddressPage(),
-            )
+            ),
       },
     );
   }

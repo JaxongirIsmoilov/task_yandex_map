@@ -14,6 +14,7 @@ import 'package:task_yandex_map/src/features/select_address/presentation/widgets
 import 'package:task_yandex_map/src/features/select_address/presentation/widgets/custom_button.dart';
 import 'package:yandex_mapkit/yandex_mapkit.dart';
 
+import '../data/app_location.dart';
 import 'bloc/select_address_bloc.dart';
 
 class SelectAddressPage extends StatefulWidget {
@@ -33,12 +34,14 @@ class _SelectAddressPageState extends State<SelectAddressPage> {
   String? _currentAddress;
   Position? _currentPosition;
   bool isPicking = false;
+  List<AppLatLong> addresses = [];
   // ValueNotifier<bool> isPicking = ValueNotifier(false);
 
   @override
   void initState() {
     _initPermission();
     _moveToCameraToCurrentPosition();
+    context.read<SelectAddressBloc>().add(GettingLocationsEvent());
     super.initState();
   }
 
@@ -92,6 +95,31 @@ class _SelectAddressPageState extends State<SelectAddressPage> {
     return true;
   }
 
+  Future<dynamic> _confirmSaveAddress() async{
+    await showDialog(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        title: const Text('Save address'),
+        content: const Text('Addressni rostan ham saqlashni xoxlaysizmi?'),
+        actions: [
+          TextButton(
+            onPressed: () {
+              Navigator.of(ctx).pop();
+            },
+            child: const Text('Yo\'q'),
+          ),
+          TextButton(
+            onPressed: () {
+              Navigator.of(ctx).pop();
+              context.read<SelectAddressBloc>().add(SaveLocationsEvent(locations: addresses, context: context),);
+            },
+            child: const Text('Ha'),
+          ),
+        ],
+      ),
+    );
+  }
+
   _moveToCameraToCurrentPosition() async {
     final hasPermission = await _handleLocationPermission();
     if (!hasPermission) return;
@@ -128,26 +156,15 @@ class _SelectAddressPageState extends State<SelectAddressPage> {
     });
   }
 
-  Future<void> _getAddressFromLatLng(double lat, double long) async {
-    await geoCoding
-        .placemarkFromCoordinates(lat, long)
-        .then((List<geoCoding.Placemark> placemarks) {
-      geoCoding.Placemark place = placemarks[0];
-      setState(() {
-        _currentAddress = "${place.subLocality}, ${place.street}";
-        print(_currentAddress);
-      });
-    }).catchError((e) {
-      debugPrint(e);
-    });
-  }
-
   @override
   Widget build(BuildContext context) {
     return BlocBuilder<SelectAddressBloc, SelectAddressState>(
       builder: (context, state) {
         isPicking = state.isPicking;
         _currentAddress =  state.pickedAddress;
+        if(state.locations != null){
+          addresses = state.locations;
+        }
         return Scaffold(
           backgroundColor: AppColors.appBakColor,
           body: SafeArea(
@@ -193,13 +210,15 @@ class _SelectAddressPageState extends State<SelectAddressPage> {
                         Row(
                           children: [
                             20.pw,
-                            Text(
-                              isPicking
-                                  ? 'Qidirilmoqda ...'
-                                  : _currentAddress ?? 'Not Found',
-                              overflow: TextOverflow.ellipsis,
-                              style: const TextStyle(
-                                  color: Colors.black, fontSize: 16),
+                            Expanded(
+                              child: Text(
+                                isPicking
+                                    ? 'Qidirilmoqda ...'
+                                    : _currentAddress ?? 'Not Found',
+                                overflow: TextOverflow.ellipsis,
+                                style: const TextStyle(
+                                    color: Colors.black, fontSize: 16),
+                              ),
                             ),
                           ],
                         ),
@@ -269,7 +288,7 @@ class _SelectAddressPageState extends State<SelectAddressPage> {
             child: const Icon(Icons.gps_fixed),
           ),
           bottomNavigationBar: GestureDetector(
-            onTap: () {},
+            onTap: _confirmSaveAddress,
             child: const Padding(
                 padding: EdgeInsets.all(10),
                 child: CustomButton(name: 'Tasdiqlash')),
