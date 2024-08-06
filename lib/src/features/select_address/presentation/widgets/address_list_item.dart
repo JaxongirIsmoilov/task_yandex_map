@@ -3,9 +3,9 @@ import 'package:flutter_svg/flutter_svg.dart';
 import 'package:task_yandex_map/src/core/const/icons/app_icons.dart';
 import 'package:task_yandex_map/src/core/extensions/sized_box.dart';
 import 'package:task_yandex_map/src/core/extensions/widget_ext.dart';
-import 'package:task_yandex_map/src/features/select_address/data/app_location.dart';
 
 import '../../../../core/components/decorations/decoration.dart';
+import '../../data/location.dart';
 
 
 class AddressListItem extends StatelessWidget {

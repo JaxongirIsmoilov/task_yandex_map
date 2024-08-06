@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_svg/flutter_svg.dart';
@@ -10,11 +11,12 @@ import 'package:task_yandex_map/src/core/const/colors/app_colors.dart';
 import 'package:task_yandex_map/src/core/const/consts.dart';
 import 'package:task_yandex_map/src/core/const/icons/app_icons.dart';
 import 'package:task_yandex_map/src/core/extensions/sized_box.dart';
+import 'package:task_yandex_map/src/features/select_address/presentation/saved_adresses_page.dart';
 import 'package:task_yandex_map/src/features/select_address/presentation/widgets/custom_back_button.dart';
 import 'package:task_yandex_map/src/features/select_address/presentation/widgets/custom_button.dart';
 import 'package:yandex_mapkit/yandex_mapkit.dart';
 
-import '../data/app_location.dart';
+import '../data/location.dart';
 import 'bloc/select_address_bloc.dart';
 
 class SelectAddressPage extends StatefulWidget {
@@ -35,13 +37,14 @@ class _SelectAddressPageState extends State<SelectAddressPage> {
   Position? _currentPosition;
   bool isPicking = false;
   List<AppLatLong> addresses = [];
+  List<AppLatLong> mutableAddresses = [];
   // ValueNotifier<bool> isPicking = ValueNotifier(false);
 
   @override
   void initState() {
     _initPermission();
     _moveToCameraToCurrentPosition();
-    context.read<SelectAddressBloc>().add(GettingLocationsEvent());
+    // context.read<SelectAddressBloc>().add(GettingLocationsEvent());
     super.initState();
   }
 
@@ -110,8 +113,9 @@ class _SelectAddressPageState extends State<SelectAddressPage> {
           ),
           TextButton(
             onPressed: () {
+              final newAddedAddress = AppLatLong(_currentPosition?.latitude ?? lat, _currentPosition?.longitude ?? long, _currentAddress ?? "");
               Navigator.of(ctx).pop();
-              context.read<SelectAddressBloc>().add(SaveLocationsEvent(locations: addresses, context: context),);
+              context.read<SelectAddressBloc>().add(SaveLocationsEvent(location: newAddedAddress, context: context),);
             },
             child: const Text('Ha'),
           ),
@@ -124,7 +128,7 @@ class _SelectAddressPageState extends State<SelectAddressPage> {
     final hasPermission = await _handleLocationPermission();
     if (!hasPermission) return;
     await Geolocator.getCurrentPosition().then((Position position) {
-      setState(() => _currentPosition = position);
+      context.read<SelectAddressBloc>().add(GetCurrentPositionEvent(current: position));
     }).catchError((e) {
       debugPrint(e);
     });
@@ -161,6 +165,7 @@ class _SelectAddressPageState extends State<SelectAddressPage> {
     return BlocBuilder<SelectAddressBloc, SelectAddressState>(
       builder: (context, state) {
         isPicking = state.isPicking;
+        _currentPosition = state.currentPosition;
         _currentAddress =  state.pickedAddress;
         if(state.locations != null){
           addresses = state.locations;
@@ -257,6 +262,8 @@ class _SelectAddressPageState extends State<SelectAddressPage> {
                               }
                             },
                           ),
+                          // Positioned(top: 10, right: 10, child: Icon(Icons.bookmark, color: Colors.blueAccent, size: 30,),),
+                          // Align(alignment: Alignment.topRight, child: SvgPicture.asset(AppIcons.savedSvg)),
                           isPicking
                               ? Container(
                                   width: double.maxFinite,
@@ -272,6 +279,22 @@ class _SelectAddressPageState extends State<SelectAddressPage> {
                               : Align(
                                   alignment: Alignment.center,
                                   child: SvgPicture.asset(AppIcons.profileSvg)),
+                          GestureDetector(
+                            onTap: (){
+                              Navigator.of(context).push(
+                                MaterialPageRoute(
+                                  builder: (context) => BlocProvider(
+                                    create: (context) => SelectAddressBloc(),
+                                    child: const SavedAddressesPage(),
+                                  ),
+                                ),
+                              );
+                            },
+                            child: const Padding(
+                              padding: EdgeInsets.only(top: 8.0, right: 8.0),
+                              child: Align(alignment: Alignment.topRight, child: Icon(Icons.bookmark, size: 50, color: Colors.blue,)),
+                            ),
+                          ),
                         ],
                       ),
                     ),

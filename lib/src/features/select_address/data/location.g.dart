@@ -6,17 +6,17 @@ part of 'location.dart';
 // TypeAdapterGenerator
 // **************************************************************************
 
-class LocationAdapter extends TypeAdapter<Location> {
+class AppLatLongAdapter extends TypeAdapter<AppLatLong> {
   @override
   final int typeId = 0;
 
   @override
-  Location read(BinaryReader reader) {
+  AppLatLong read(BinaryReader reader) {
     final numOfFields = reader.readByte();
     final fields = <int, dynamic>{
       for (int i = 0; i < numOfFields; i++) reader.readByte(): reader.read(),
     };
-    return Location(
+    return AppLatLong(
       fields[0] as double,
       fields[1] as double,
       fields[2] as String,
@@ -24,7 +24,7 @@ class LocationAdapter extends TypeAdapter<Location> {
   }
 
   @override
-  void write(BinaryWriter writer, Location obj) {
+  void write(BinaryWriter writer, AppLatLong obj) {
     writer
       ..writeByte(3)
       ..writeByte(0)
@@ -41,7 +41,7 @@ class LocationAdapter extends TypeAdapter<Location> {
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
-      other is LocationAdapter &&
+      other is AppLatLongAdapter &&
           runtimeType == other.runtimeType &&
           typeId == other.typeId;
 }

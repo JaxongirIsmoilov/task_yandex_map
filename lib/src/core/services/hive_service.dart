@@ -1,29 +1,29 @@
-import 'dart:io';
-
-import 'package:hive/hive.dart';
 import 'package:hive_flutter/adapters.dart';
-import 'package:task_yandex_map/src/core/const/consts.dart';
-import 'package:task_yandex_map/src/features/select_address/data/app_location.dart';
 
 import '../../features/select_address/data/location.dart';
-import '../const/hive_box/box_consts.dart';
 
 class HiveService {
   HiveService._();
+
   static Future<void> initHive() async {
     await Hive.initFlutter();
-    await Hive.openBox('AppBox');
+    Hive.registerAdapter(AppLatLongAdapter());
+    await Hive.openBox<AppLatLong>('addressesBox');
+    // await Hive.openBox('AppBox');
   }
 
-  static final box = Hive.box('AppBox');
+  static final Box<AppLatLong> latLongBox = Hive.box<AppLatLong>('addressesBox');
 
-  static Future<void> saveAddress(List<AppLatLong> appLatLong) async{
-    box.put(BoxConsts.locations,appLatLong);
+  static Future<void> saveAddress(List<AppLatLong> appLatLong) async {
+    await latLongBox.clear();
+    await latLongBox.addAll(appLatLong);
   }
 
-  static Future<List<AppLatLong>> getSavedAddress(String name){
-    return box.get(BoxConsts.locations);
+  static List<AppLatLong> getSavedAddress() {
+    return latLongBox.values.toList();
   }
 
-
+  static Future<void> deleteAddress(int index) async {
+    await latLongBox.deleteAt(index);
+  }
 }

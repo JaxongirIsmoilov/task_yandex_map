@@ -8,6 +8,7 @@ import 'package:task_yandex_map/src/features/select_address/presentation/select_
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await HiveService.initHive();
+
   runApp(const MyApp());
 }
 

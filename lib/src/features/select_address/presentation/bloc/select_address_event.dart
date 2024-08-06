@@ -16,12 +16,23 @@ class PickingAddressEvent extends SelectAddressEvent{
 
 class SaveLocationsEvent extends SelectAddressEvent {
   final BuildContext context;
-  final List<AppLatLong> locations;
+  final AppLatLong location;
 
-  SaveLocationsEvent({required this.locations, required this.context,});
+  SaveLocationsEvent({required this.location, required this.context,});
 }
 
 class GettingLocationsEvent extends SelectAddressEvent {
 
 }
 
+class DeleteLocationEvent extends SelectAddressEvent {
+  final int index;
+
+  DeleteLocationEvent({required this.index});
+}
+
+class GetCurrentPositionEvent extends SelectAddressEvent {
+  final Position current;
+
+  GetCurrentPositionEvent({required this.current});
+}
