@@ -9,7 +9,6 @@ class HiveService {
     await Hive.initFlutter();
     Hive.registerAdapter(AppLatLongAdapter());
     await Hive.openBox<AppLatLong>('addressesBox');
-    // await Hive.openBox('AppBox');
   }
 
   static final Box<AppLatLong> latLongBox = Hive.box<AppLatLong>('addressesBox');
